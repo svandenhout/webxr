@@ -1,3 +1,9 @@
+/**
+ * oclusion
+ *
+ * Renders a sphere that will be occluded (hidden) when it's behind a (real) object in the users environment.
+ */
+
 import * as THREE from "three";
 import { ARButton } from "three/addons/webxr/ARButton.js";
 
@@ -56,45 +62,6 @@ function init() {
 
   window.addEventListener("resize", onWindowResize);
 }
-
-function upscaleDepthMap(depthData: XRCPUDepthInformation) {
-  const width = depthData.width;
-  const height = depthData.height;
-  const depthArray = new Uint8Array(width * height);
-  // for (let y = 0; y <  height; y++) {
-  //   for (let x = 0; x <  width; x++) {
-  //     try {
-  //       const normalizedX = Math.min(Math.max(x / width, 0), 1);
-  //       const normalizedY = Math.min(Math.max(y / height, 0), 1);
-  //       const depth = depthData.getDepthInMeters(normalizedX, normalizedY);
-  //       // Normalize depth to a value between 0-255 for grayscale
-  //       const normalizedDepth = (depth - minDepth) / (maxDepth - minDepth);
-  //       console.log('normalizedDepth', normalizedDepth);
-  //       depthArray[y * width + x] = Math.round(normalizedDepth * 255);
-  //     } catch(e) {
-  //       console.log('error', e);
-  //     }
-  //   }
-  // }
-
-  for (let i = 0; i < depthArray.length; i++) {
-    depthArray[i] = (i / depthArray.length) * 255; // Fake increasing depth
-  }
-
-  // console.log('depthArray', depthArray.slice(0, 100));
-
-  // Create Three.js texture
-  const depthTexture = new THREE.DataTexture(
-    depthArray,
-    width,
-    height,
-    THREE.RGBAFormat
-  );
-  depthTexture.needsUpdate = true;
-  
-  return depthTexture;
-}
-
 
 function checkOcclusion(depthData, object3D, camera) {
   if (!depthData) return;

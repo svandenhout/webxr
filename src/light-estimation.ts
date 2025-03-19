@@ -1,3 +1,9 @@
+/**
+ * light estimation
+ *
+ * The scene estimates light and maps it on the mesh, making it blend into the environment like a real object
+ */
+
 import * as THREE from "three";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
 import { ARButton } from "three/addons/webxr/ARButton.js";
@@ -8,9 +14,6 @@ let camera: THREE.PerspectiveCamera,
   renderer: THREE.WebGLRenderer;
 let controller: THREE.XRTargetRaySpace;
 let defaultEnvironment: THREE.Texture;
-
-let hitTestSource: XRHitTestSource | null = null;
-let hitTestSourceRequested = false;
 
 init();
 

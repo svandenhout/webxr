@@ -1,3 +1,10 @@
+/**
+ * environment collision
+ *
+ * Use the layout of your environment as a boundary
+ *
+ * A cylinder is rendered in the location where the device is pointing to, it will not move through a wall or other object. 
+ */
 import * as THREE from "three";
 import { ARButton } from "three/addons/webxr/ARButton.js";
 
@@ -88,11 +95,8 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function checkCollisionWithRealWorld(frame, object3D, depthData) {
+function checkCollisionWithRealWorld(_frame, object3D, depthData) {
   if (!depthData) return;
-
-  const depthWidth = depthData.width;
-  const depthHeight = depthData.height;
 
   // Convert object position from world space to screen space
   const vector = new THREE.Vector3();

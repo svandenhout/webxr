@@ -1,3 +1,8 @@
+/**
+ * depth estimation
+ *
+ * Display the depth map as a geometry plane, see what a device sees when requesting depth information
+ */
 import * as THREE from "three";
 import { ARButton } from "three/addons/webxr/ARButton.js";
 

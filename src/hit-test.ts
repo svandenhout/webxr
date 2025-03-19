@@ -1,3 +1,9 @@
+/**
+ * hit test
+ * 
+ * Touch the screen to place dots in the environment ;)
+ */
+
 import * as THREE from "three";
 import { ARButton } from "three/addons/webxr/ARButton.js";
 
