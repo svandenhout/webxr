@@ -8,7 +8,6 @@ let camera: THREE.PerspectiveCamera,
 let controller: THREE.XRTargetRaySpace;
 
 let mesh: THREE.Mesh;
-const hitMatrix = new THREE.Matrix4();
 let hitTestSource: XRHitTestSource | null = null;
 
 init();
@@ -59,11 +58,15 @@ function init() {
 
   document.body.appendChild(
     ARButton.createButton(renderer, { 
-      requiredFeatures: ["hit-test"], // Enable depth sensing
+      requiredFeatures: ["hit-test", "depth-sensing"], // Enable depth sensing
+      depthSensing: {
+        usagePreference: ["cpu-optimized", "gpu-optimized"],
+        dataFormatPreference: ['luminance-alpha']
+      }
     })
   );
 
-  const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 0).translate(
+  const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 32).translate(
     0,
     0.1,
     0
@@ -73,13 +76,6 @@ function init() {
   scene.add(mesh)
 
   controller = renderer.xr.getController(0);
-  controller.addEventListener('select', (_event) => {
-    const material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
-    const mesh = new THREE.Mesh( geometry, material );
-    mesh.position.setFromMatrixPosition(hitMatrix)
-    mesh.quaternion.setFromRotationMatrix(hitMatrix)
-    scene.add(mesh)
-  })
   scene.add(controller);
 
   window.addEventListener("resize", onWindowResize);
@@ -92,18 +88,66 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+function checkCollisionWithRealWorld(frame, object3D, depthData) {
+  if (!depthData) return;
+
+  const depthWidth = depthData.width;
+  const depthHeight = depthData.height;
+
+  // Convert object position from world space to screen space
+  const vector = new THREE.Vector3();
+  vector.setFromMatrixPosition(object3D.matrixWorld);
+  vector.project(camera); // Converts world coordinates to screen space
+
+  // Convert screen coordinates (-1 to 1) to normalized depth coordinates (0 to 1)
+  const normalizedX = (vector.x + 1) / 2;
+  const normalizedY = 1 - (vector.y + 1) / 2; // Flip Y-axis
+
+  // Ensure values are clamped within [0,1] range
+  const clampedX = Math.min(Math.max(normalizedX, 0), 1);
+  const clampedY = Math.min(Math.max(normalizedY, 0), 1);
+
+  try {
+    // Get real-world depth at this position
+    const realWorldDepth = depthData.getDepthInMeters(clampedX, clampedY);
+    const objectDepth = object3D.position.distanceTo(camera.position); // Distance from camera
+
+    // Detect collision: If virtual object is "inside" real-world depth
+    if (objectDepth > realWorldDepth) {
+      console.log("Collision Detected!");
+      
+      object3D.material.color.set(0xff0000); // Turn red on collision
+      return true;
+    } else {
+      object3D.material.color.set(0x00ff00); // Green if no collision
+      return false;
+    }
+  } catch (error) {
+    console.error("Error getting depth for collision check:", error);
+  }
+}
+
 function animate(_time, frame: XRFrame) {
   if (!frame) return;
 
   const referenceSpace = renderer.xr.getReferenceSpace();
+  if (!referenceSpace) return;
 
   if (!hitTestSource) return;
   const hitTestResults = frame.getHitTestResults(hitTestSource);
 
+  const viewerPose = frame.getViewerPose(referenceSpace);
+  if (!viewerPose) return;
+  
+  const depthData = frame.getDepthInformation(viewerPose.views[0]);
+  if (!depthData) { return; }
+
   if (hitTestResults.length > 0) {  
     const pose = hitTestResults[0].getPose(referenceSpace);
-
-    hitMatrix.fromArray(pose.transform.matrix);
+    if (!checkCollisionWithRealWorld(frame, mesh, depthData)) {
+      mesh.position.setFromMatrixPosition(new THREE.Matrix4().fromArray(pose.transform.matrix))
+      mesh.quaternion.setFromRotationMatrix(new THREE.Matrix4().fromArray(pose.transform.matrix))
+    }
   }
 
   renderer.render(scene, camera);

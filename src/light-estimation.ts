@@ -31,14 +31,24 @@ function init() {
   defaultLight.position.set(0.5, 1, 0.25);
   scene.add(defaultLight);
 
-  //
-
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
   renderer.xr.enabled = true;
   container.appendChild(renderer.domElement);
+
+
+  const ballGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+  const ballMaterial = new THREE.MeshStandardMaterial({
+    color: 0xff0000,
+    metalness: 1.0, // Full reflectivity
+    roughness: 0.1 // Very smooth surface
+  });
+  const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
+  ballMesh.position.z = -2;
+
+  scene.add(ballMesh);
 
   // Don't add the XREstimatedLight to the scene initially.
   // It doesn't have any estimated lighting values until an AR session starts.
@@ -54,6 +64,7 @@ function init() {
     if (xrLight.environment) {
       scene.environment = xrLight.environment;
     }
+  
   });
 
   xrLight.addEventListener("estimationend", () => {
@@ -86,16 +97,6 @@ function init() {
     })
   );
 
-  const ballGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-  const ballMaterial = new THREE.MeshStandardMaterial({
-    color: 0xdddddd,
-    roughness: 1,
-    metalness: 1,
-  });
-  const ballMesh = new THREE.Mesh(ballGeometry, ballMaterial);
-  ballMesh.position.z = -2;
-
-  scene.add(ballMesh);
 
   function onSelect() {
     const session = renderer.xr.getSession();
