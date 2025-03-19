@@ -79,7 +79,6 @@ function createDepthPlaneWithHeatmap(depthData, width, height, scale = 1) {
   // Second pass: Assign depth values and map to color
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const depthIndex = y * width + x;
       const normalizedX = x / width;
       const normalizedY = y / height;
 
