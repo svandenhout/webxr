@@ -1,6 +1,6 @@
 # Spatial computing for the web (WebXR demystified)
  
-Several coding examples used explain how WebXR features and showing what they are good for.
+Several coding examples used explain how WebXR features work and showing what they are good for.
 All these features are possible on a low end android phone
 
 (a high end device will give better results though ;)
