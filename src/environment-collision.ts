@@ -95,7 +95,7 @@ function onWindowResize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function checkCollisionWithRealWorld(_frame, object3D, depthData) {
+function checkCollisionWithRealWorld(_frame, object3D, depthData, slack = 0.1) {
   if (!depthData) return;
 
   // Convert object position from world space to screen space
@@ -117,7 +117,7 @@ function checkCollisionWithRealWorld(_frame, object3D, depthData) {
     const objectDepth = object3D.position.distanceTo(camera.position); // Distance from camera
 
     // Detect collision: If virtual object is "inside" real-world depth
-    if (objectDepth > realWorldDepth) {
+    if (objectDepth > realWorldDepth + slack) {
       console.log("Collision Detected!");
       
       object3D.material.color.set(0xff0000); // Turn red on collision
