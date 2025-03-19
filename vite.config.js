@@ -5,7 +5,7 @@ import mkcert from "vite-plugin-mkcert";
 export default defineConfig({
   server: { https: true, host: "0.0.0.0" },
   plugins: [mkcert()],
-  base: "webxr",
+  base: "https://svandenhout.github.io/webxr",
   build: {
     rollupOptions: {
       input: {
