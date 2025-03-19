@@ -69,7 +69,7 @@ function init() {
     })
   );
 
-  const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0.2, 0).translate(
+  const geometry = new THREE.CylinderGeometry(0.1, 0.1, 0, 32).translate(
     0,
     0.1,
     0
